@@ -1,0 +1,76 @@
+# ─── Unity ────────────────────────────────────────────────────────────────────
+# Carpetas generadas por el Editor de Unity. NO deben versionarse.
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/[Aa]nalytics/
+/[Pp]rofile[Ii]tiner/
+/[Bb]urstCache/
+/[Aa]utoLibraries/
+
+# Autoguardados del editor (recuperación de escenas tras un cierre inesperado)
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Backup/
+
+# ─── Soluciones / proyectos autogenerados ─────────────────────────────────────
+# Unity regenera estos archivos al abrir el proyecto; no se versionan.
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Metadatos de los anteriores (Unity también los genera)
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+*.opendb.meta
+*.VC.db.meta
+
+# Reporte de crash
+sysinfo.txt
+
+# ─── Compilaciones / distribución ─────────────────────────────────────────────
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Datos de Addressables empaquetados
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Android generado temporalmente
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ─── IDEs / herramientas ──────────────────────────────────────────────────────
+.vs/
+.idea/
+.vscode/
+.gradle/
+/SyncToolCache/
+
+# Cobertura de código
+[Uu]nit[Cc]o[Vv]erage/
+
+# Cachés del paquete de Input System
+/[Aa]ssets/InputSystem/
+
+# Archivos variados que no aportan al control de versiones
+*.pdf
