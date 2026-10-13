@@ -17,6 +17,8 @@
 # Autoguardados del editor (recuperación de escenas tras un cierre inesperado)
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/_Backup/
+/[Aa]ssets/_Recovery.meta
+/[Aa]ssets/_Backup.meta
 
 # ─── Soluciones / proyectos autogenerados ─────────────────────────────────────
 # Unity regenera estos archivos al abrir el proyecto; no se versionan.
