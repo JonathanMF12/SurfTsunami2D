@@ -102,10 +102,10 @@ public class MusicaFondo : MonoBehaviour
 
         if (clip != null)
         {
-            // Si el jugador aporta su propia música, se usa para el juego y no se
-            // pisa con el jingle generado de Game Over.
+            // Si el jugador aporta su propia música, solo se cambia la música del juego.
+            // El tema de Game Over se mantiene intacto (generado por código).
             clipJuego = clip;
-            clipGameOver = null;
+            clipGameOver = GeneradorMusica.CrearTemaGameOver();
         }
         else
         {

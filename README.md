@@ -124,6 +124,10 @@ consola y pantalla táctil (móvil/tablet)**.
 - El puntaje se muestra en el HUD y se guarda en el ranking de la portada al terminar
   la partida.
 
+> 💡 Las **tablas de bonus** no aparecen todo el rato: asoman **aproximadamente una vez
+> por minuto** y van **alternando entre 5 sprites** distintos (tabla1…tabla5) para que se
+> vean coloridas. Cruza la pantalla de derecha a izquierda y, si la tocas, suma **+250**.
+
 ### Salto
 
 - **Automático**: al llegar a la copa de la ola mientras subes (`maxY`).
@@ -181,7 +185,7 @@ Navegación: ratón/táctil, flechas + Enter, o mando.
 | 🦈 **Tiburón** | El más veloz (4,2). 4 fotogramas de nado. |
 | 🐬 **Delfín** | Se acerca nadando con 6 fotogramas; ondula más que los demás. |
 | 🏊 **Bañista** | Obstáculo lento y de poco bote, con 8 fotogramas. |
-| 🏄 **Tablas de bonus** | Objetos que suman +250 puntos al recogerlos y reaparecen a la derecha. |
+| 🏄 **Tablas de bonus** | Objetos que suman +250 puntos al recogerlos. Aparecen ~1 vez por minuto y alternan entre 5 sprites. |
 | 🖼️ **Fondo (parallax)** | Cielo, sol, islas, ola y mar que se mueven a distintas velocidades en bucle. |
 | 📊 **HUD** | Vidas (tablas de surf), puntaje y cartel de Game Over. |
 
@@ -213,7 +217,8 @@ SurfTsunami2D/
 | `GameManager.cs` | Estado global del juego: vidas, puntaje, Game Over, reinicio (R) y vuelta al menú (Esc/M). Patrón *singleton*. |
 | `SurfistaController.cs` | Control del jugador: movimiento suave, límites de cámara, salto con truco aéreo, vidas, invulnerabilidad y animación de caída. |
 | `Obstaculo.cs` | Movimiento de las criaturas, ondulación en el agua, colisión con el surfista, puntos por esquivar y reaparición. |
-| `ItemBonus.cs` | Tablas de surf de bonificación: movimiento, balanceo, +250 puntos y reaparición. |
+| `ItemBonus.cs` | Tablas de surf de bonificación: movimiento, balanceo y +250 puntos. Puede reaparecer sola o dejarse controlar por un `GestorBonus`. |
+| `GestorBonus.cs` | Decide **cuándo** aparece el bonus (~1 vez por minuto) y **qué sprite** usa, alternando entre las 5 tablas de `Assets/Sprites/Bonus`. |
 | `AutoConfiguradorJuego.cs` | Configura toda la escena automáticamente al cargarse: asigna scripts, carga fotogramas, ajusta tamaños y colisionadores. |
 | `AnimadorSurfista.cs` | Animación por fotogramas del surfista (surf, salto y caída) sin Animator. |
 | `AnimadorPulpo.cs` | Animación por fotogramas del pulpo. |
@@ -297,6 +302,16 @@ Todo lo que se fue construyendo, desde el principio, con la documentación inter
 - **`CapasParallax.cs`**: fondo multicapa en bucle (cielo, islas, ola, mar) y el **Sol**
   como objeto único que reaparece por el otro lado.
 
+### Etapa 6 — Bonus menos frecuente y Opciones navegable
+- **`GestorBonus.cs`**: nuevo gestor que crea el bonus y decide **cuándo** aparece
+  (~1 vez por minuto, configurable) y **con qué sprite**, alternando entre las 5 tablas
+  de `Assets/Sprites/Bonus` (tabla1…tabla5). Antes el bonus reaparecía casi seguido.
+- **`ItemBonus.cs`**: modo opcional `reaparecerAutomaticamente` para que, cuando lo lleva
+  un `GestorBonus`, se oculte al recogerlo o al salir de pantalla en vez de reaparecer.
+- **`MenuInicio.cs`**: los paneles (**OPTIONS**, **LEADERBOARDS**) ahora se pueden
+  recorrer con las **flechas ↑/↓** (y mando), no solo con el ratón; se resalta la opción
+  activa y se elige con **Enter/Espacio**.
+
 ---
 
 ## 🚀 Cómo abrir y ejecutar
@@ -319,6 +334,27 @@ Todo lo que se fue construyendo, desde el principio, con la documentación inter
 3. Elige **Android** → **Switch Platform** → **Build** (o **Build And Run** con el móvil
    conectado).
 4. La orientación ya está en **horizontal** y el Input System nuevo es compatible con táctil.
+
+### APK de Android con un solo clic
+
+El proyecto trae `CompilarAPK.bat` y el script `Assets/Editor/BuildAndroid.cs`, que
+generan un **APK instalable** sin abrir el editor:
+
+1. **Cierra Unity** (bloquea el proyecto y consume casi toda la RAM).
+2. Doble clic en **`CompilarAPK.bat`**.
+3. Cuando termine, el APK queda en **`Builds/SurfTsunami2D.apk`**.
+
+Mándalo al móvil (WhatsApp, Drive, Telegram…) e instálalo activando *«Instalar apps de
+fuentes desconocidas»*. El APK es de **depuración**, **arm64**, Android 8 o superior y
+orientación horizontal.
+
+También se puede compilar desde el editor con el menú
+**Build → Android APK**, o por línea de comandos:
+
+```bat
+Unity.exe -batchmode -nographics -quit -projectPath "<proyecto>" -buildTarget Android ^
+          -executeMethod BuildAndroid.BuildAPK -logFile "Builds\build-android.log"
+```
 
 ---
 

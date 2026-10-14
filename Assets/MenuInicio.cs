@@ -105,6 +105,7 @@ public class MenuInicio : MonoBehaviour
 
     private readonly List<ZonaOpcion> zonas = new List<ZonaOpcion>();
     private readonly List<BotonPanel> botonesPanel = new List<BotonPanel>();
+    private readonly List<BotonPanel> botonesActivos = new List<BotonPanel>();
 
     private GameObject panelOpciones;
     private GameObject panelPuntajes;
@@ -118,6 +119,7 @@ public class MenuInicio : MonoBehaviour
 
     private int seleccionada;
     private int indiceHover = -1;
+    private int botonSeleccionado; // Botón resaltado dentro de un panel (flechas/teclado).
     private bool construdo;
     private int ultimoAncho;
     private int ultimoAlto;
@@ -611,6 +613,52 @@ public class MenuInicio : MonoBehaviour
             return;
         }
 
+        // Botones del panel abierto (en orden de arriba a abajo).
+        botonesActivos.Clear();
+        for (int i = 0; i < botonesPanel.Count; i++)
+        {
+            if (botonesPanel[i].panel == panelActivo) botonesActivos.Add(botonesPanel[i]);
+        }
+        if (botonesActivos.Count == 0) return;
+
+        if (botonSeleccionado < 0 || botonSeleccionado >= botonesActivos.Count) botonSeleccionado = 0;
+
+        // --- Navegación con teclado (flechas / W-S) ---
+        if (teclado != null)
+        {
+            bool abajo = teclado.downArrowKey.wasPressedThisFrame || teclado.sKey.wasPressedThisFrame;
+            bool arriba = teclado.upArrowKey.wasPressedThisFrame || teclado.wKey.wasPressedThisFrame;
+
+            if (abajo) botonSeleccionado = (botonSeleccionado + 1) % botonesActivos.Count;
+            if (arriba) botonSeleccionado = (botonSeleccionado - 1 + botonesActivos.Count) % botonesActivos.Count;
+
+            if (teclado.enterKey.wasPressedThisFrame || teclado.numpadEnterKey.wasPressedThisFrame ||
+                teclado.spaceKey.wasPressedThisFrame)
+            {
+                botonesActivos[botonSeleccionado].accion?.Invoke();
+                return;
+            }
+        }
+
+        // --- Navegación con mando (cruceta) ---
+        if (mando != null)
+        {
+            if (mando.dpad.down.wasPressedThisFrame)
+            {
+                botonSeleccionado = (botonSeleccionado + 1) % botonesActivos.Count;
+            }
+            if (mando.dpad.up.wasPressedThisFrame)
+            {
+                botonSeleccionado = (botonSeleccionado - 1 + botonesActivos.Count) % botonesActivos.Count;
+            }
+            if (mando.buttonSouth.wasPressedThisFrame)
+            {
+                botonesActivos[botonSeleccionado].accion?.Invoke();
+                return;
+            }
+        }
+
+        // --- Ratón / táctil ---
         Vector2 posPuntero = Vector2.zero;
         bool hayPuntero = false;
         bool presionado = false;
@@ -634,19 +682,33 @@ public class MenuInicio : MonoBehaviour
             if (toque.press.wasPressedThisFrame) presionado = true;
         }
 
-        for (int i = 0; i < botonesPanel.Count; i++)
+        int hover = -1;
+        if (hayPuntero)
         {
-            BotonPanel b = botonesPanel[i];
-            if (b.panel != panelActivo) continue;
-
-            bool encima = hayPuntero && RectTransformUtility.RectangleContainsScreenPoint(b.zona, posPuntero, null);
-            if (b.fondo != null) b.fondo.color = encima ? colorBotonHover : colorBotonNormal;
-
-            if (encima && presionado)
+            for (int i = 0; i < botonesActivos.Count; i++)
             {
-                b.accion?.Invoke();
-                return;
+                if (RectTransformUtility.RectangleContainsScreenPoint(botonesActivos[i].zona, posPuntero, null))
+                {
+                    hover = i;
+                    break;
+                }
             }
+        }
+
+        // El ratón y el teclado comparten la misma selección.
+        if (hover >= 0) botonSeleccionado = hover;
+
+        for (int i = 0; i < botonesActivos.Count; i++)
+        {
+            BotonPanel b = botonesActivos[i];
+            bool resaltado = (i == botonSeleccionado);
+            if (b.fondo != null) b.fondo.color = resaltado ? colorBotonHover : colorBotonNormal;
+        }
+
+        if (presionado && hover >= 0)
+        {
+            botonesActivos[hover].accion?.Invoke();
+            return;
         }
     }
 
@@ -656,6 +718,7 @@ public class MenuInicio : MonoBehaviour
         panelActivo = panel;
         panelOpciones.SetActive(panel == panelOpciones);
         panelPuntajes.SetActive(panel == panelPuntajes);
+        botonSeleccionado = 0;
 
         if (panel == panelOpciones) RefrescarOpciones();
         if (panel == panelPuntajes) RefrescarPuntajes();

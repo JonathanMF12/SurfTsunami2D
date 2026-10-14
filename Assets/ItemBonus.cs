@@ -15,10 +15,18 @@ public class ItemBonus : MonoBehaviour
     public float minY = -3.8f;
     public float maxY = -1.2f;
 
+    [Header("Modo de aparición")]
+    [Tooltip("Si está activo, al recogerlo o salir de pantalla reaparece a la derecha. " +
+             "Apágalo si lo controla un GestorBonus (aparece de vez en cuando).")]
+    public bool reaparecerAutomaticamente = true;
+
     private float baseY;
+    private SpriteRenderer sr;
 
     void Awake()
     {
+        sr = GetComponent<SpriteRenderer>();
+
         Collider2D col = GetComponent<Collider2D>();
         if (col == null)
         {
@@ -45,7 +53,8 @@ public class ItemBonus : MonoBehaviour
 
         if (transform.position.x < limiteIzquierdo)
         {
-            Reaparecer();
+            if (reaparecerAutomaticamente) Reaparecer();
+            else Ocultar();
         }
     }
 
@@ -67,7 +76,23 @@ public class ItemBonus : MonoBehaviour
                 GameManager.Instancia.SumarPuntaje(puntosBonus);
                 Debug.Log($"¡BONUS RECOGIDO! +{puntosBonus} puntos.");
             }
-            Reaparecer();
+
+            if (reaparecerAutomaticamente) Reaparecer();
+            else Ocultar();
         }
+    }
+
+    /// <summary>
+    /// Oculta el bonus (sin apagar el objeto, para no detener al GestorBonus que lo
+    /// administra). Lo vuelve a mostrar el GestorBonus cuando toque.
+    /// </summary>
+    public void Ocultar()
+    {
+        if (sr != null) sr.enabled = false;
+
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+
+        enabled = false;
     }
 }
