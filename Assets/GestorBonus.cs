@@ -92,6 +92,8 @@ public class GestorBonus : MonoBehaviour
 
         sr = objeto.AddComponent<SpriteRenderer>();
         sr.sortingOrder = 6;
+        sr.color = Color.white;
+        AsignarMaterialDeSprite(sr);
 
         col = objeto.AddComponent<CircleCollider2D>();
         col.isTrigger = true;
@@ -109,6 +111,57 @@ public class GestorBonus : MonoBehaviour
             sr.sprite = sprites[0];
             AjustarCollider();
         }
+    }
+
+    /// <summary>
+    /// Le da al SpriteRenderer creado por código un material que sí existe en la
+    /// compilación.
+    ///
+    /// Un SpriteRenderer creado con <c>AddComponent</c> recibe el material por
+    /// defecto (Sprites-Default), que no está referenciado por ninguna parte de la
+    /// escena. Al compilar el APK ese shader se elimina y la tabla de bonus se
+    /// dibuja en magenta/rosa (el color de error de Unity).
+    ///
+    /// Solución: reutilizar el mismo material que ya usan los sprites de la escena
+    /// (Sprite-Lit-Default de URP), que sí queda incluido en la compilación. Así la
+    /// tabla se ve con los colores reales del sprite.
+    /// </summary>
+    private static void AsignarMaterialDeSprite(SpriteRenderer destino)
+    {
+        if (destino == null) return;
+
+        SpriteRenderer[] existentes = FindObjectsByType<SpriteRenderer>(FindObjectsInactive.Exclude);
+
+        // 1) Preferimos el material de otro sprite de la escena.
+        foreach (SpriteRenderer otro in existentes)
+        {
+            if (otro == null || otro == destino || otro.sharedMaterial == null) continue;
+            if (otro.sharedMaterial.shader == null) continue;
+
+            string shader = otro.sharedMaterial.shader.name.ToLowerInvariant();
+            string material = otro.sharedMaterial.name.ToLowerInvariant();
+            if (shader.Contains("sprite") || material.Contains("sprite"))
+            {
+                destino.sharedMaterial = otro.sharedMaterial;
+                return;
+            }
+        }
+
+        // 1b) Si ningún material tenía "sprite" en el nombre, usamos el primero válido.
+        foreach (SpriteRenderer otro in existentes)
+        {
+            if (otro != null && otro != destino && otro.sharedMaterial != null)
+            {
+                destino.sharedMaterial = otro.sharedMaterial;
+                return;
+            }
+        }
+
+        // 2) Último recurso: crear el material desde el shader de sprites de URP.
+        Shader shaderFallback = Shader.Find("Universal Render Pipeline/2D/Sprite-Lit-Default");
+        if (shaderFallback == null) shaderFallback = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+        if (shaderFallback == null) shaderFallback = Shader.Find("Sprites/Default");
+        if (shaderFallback != null) destino.sharedMaterial = new Material(shaderFallback);
     }
 
     /// <summary>Ajusta el colisionador al tamaño del sprite visible.</summary>
